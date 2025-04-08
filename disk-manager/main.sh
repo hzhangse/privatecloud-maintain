@@ -6,7 +6,7 @@ NEW_PARTITION=""  # 用于存储新创建的分区路径
 vg_name="vg_thinpool"       # 默认卷组名称前缀
 thin_pool_name="thinpool"   # 默认 Thin Pool 名称
 do_backup=false # 默认不备份
-
+part_type=30   #代表我机器上的lvm type
 
 # 全局变量
 STATE_FILE="./lvm_state.json"

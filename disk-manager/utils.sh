@@ -23,13 +23,13 @@ to_mb() {
 # 判断是否为分区
 is_partition() {
     local device=$1
-    [[ "$device" =~ ^/dev/(sd|vd|nvme[0-9]+)[a-z]+[0-9]+$ ]]
+    [[ "$device" =~ ^/dev/(sd[a-z][0-9]*|vd[a-z][0-9]*|nvme[0-9]+n[0-9]+)p[0-9]+$ ]]
 }
 
 # 判断是否为整块设备
 is_whole_device() {
     local device=$1
-    [[ "$device" =~ ^/dev/(sd|vd|nvme[0-9]+)[a-z]+$ ]]
+    [[ "$device" =~ ^/dev/(sd[a-z][0-9]*|vd[a-z][0-9]*|nvme[0-9]+n[0-9]+)$ ]]
 }
 
 # 检查设备是否包含分区表
@@ -77,13 +77,14 @@ check_unallocated_space() {
         if is_whole_device "$device"; then
             # 如果是整块设备，检查未分配空间
             partition_info=$(parted -s "$device" print free 2>/dev/null)
-            if echo "$partition_info" | grep -q "Free Space"; then
+             echo "$partition_info" 
+            if echo "$partition_info" | grep  "Free Space"; then
                 free_space=$(echo "$partition_info" | grep "Free Space" | tail -n 1 | awk '{print $3}')
                 if [ -z "$free_space" ]; then
                     echo "警告：无法提取设备 $device 的未分配空间大小。"
                     continue
                 fi
-
+		echo $free_space
                 # 将未分配空间添加到 FREE_SPACES 和 DEVICES
                 FREE_SPACES["$device"]=$free_space
                 DEVICES+=("$device")

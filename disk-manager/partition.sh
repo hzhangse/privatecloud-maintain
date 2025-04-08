@@ -25,13 +25,13 @@ create_partition() {
     # 使用 fdisk 创建新分区
     (
         echo n                     # 新建分区
-        echo                       # Partition type (default primary)
+        #echo                       # Partition type (default primary),在我机器上fdisk没要求选这个
         echo                       # Partition number (default next available)
         echo                       # First sector (default start of free space)
-        echo "+$size"              # Size (用户指定的大小)
+        echo +$size                # Size (用户指定的大小)
         echo t                     # Change partition type
         echo                       # Select partition (default last created)
-        echo 8e                    # Set type to LVM
+        echo $part_type            # Set type to LVM
         echo w                     # Write to 分区表
     ) | stdbuf -oL fdisk "$device" # 使用 stdbuf 强制刷新缓冲区
 

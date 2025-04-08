@@ -156,8 +156,8 @@ create_thin_lvm_on_device() {
     fi
 
     # 创建 Thin Pool
-    let actual_pool_size=thin_pool_mb-20
-    lvcreate --type thin-pool -L "${actual_pool_size}M" -n ${vg_name}_thin_pool "${vg_name}"
+    let actual_pool_size=thin_pool_mb-100
+    #lvcreate --type thin-pool -L "${actual_pool_size}M" -n ${vg_name}_thin_pool "${vg_name}"
     if [ $? -ne 0 ]; then
         echo "创建 Thin Pool 失败！"
         exit 1
