@@ -1,7 +1,5 @@
 #!/bin/bash
 
-
-
 # ==============================
 # 提取子网地址段
 # ==============================
@@ -15,10 +13,9 @@ extract_ip_range() {
 }
 
 ip_to_int() {
-    IFS='.' read -r i1 i2 i3 i4 <<< "$1"
-    echo $(( (i1 << 24) | (i2 << 16) | (i3 << 8) | i4 ))
+    IFS='.' read -r i1 i2 i3 i4 <<<"$1"
+    echo $(((i1 << 24) | (i2 << 16) | (i3 << 8) | i4))
 }
-
 
 # ==============================
 # 计算当前节点的 IP 地址范围
@@ -34,12 +31,12 @@ calculate_ip_range() {
     # 将起始和结束 IP 转换为数字形式
     START_IP_NUM=$(ip_to_int "$CIDR_START_IP")
     END_IP_NUM=$(ip_to_int "$CIDR_END_IP")
-    
+
     # 总 IP 数量和每个节点的基础 IP 数量
     TOTAL_IPS=$((END_IP_NUM - START_IP_NUM + 1))
     BASE_IPS_PER_NODE=$((TOTAL_IPS / TOTAL_NODES))
     REMAINING_IPS=$((TOTAL_IPS % TOTAL_NODES))
-    
+
     # 动态分配 IP 范围
     if [ "$INDEX" -le "$REMAINING_IPS" ]; then
         # 前几个节点多分配一个 IP 地址
@@ -76,8 +73,8 @@ configure_dhcp_for_cidr() {
     local INTERFACE=$4
     local TOTAL_NODES=$5
 
-    #calculate_ip_range "$CIDR" $i $TOTAL_NODES
-    read NODE_START_IP NODE_END_IP < <(calculate_ip_range "$CIDR" $i $TOTAL_NODES)
+    #calculate_ip_range "$CIDR" $size $TOTAL_NODES
+    read NODE_START_IP NODE_END_IP < <(calculate_ip_range "$CIDR" $size $TOTAL_NODES)
     echo "Node DHCP Start IP: $NODE_START_IP, Node DHCP End IP: $NODE_END_IP"
     # 写入 DHCP 配置
     ssh root@$NODE "cat <<EOF | tee -a /etc/dnsmasq.conf > /dev/null
@@ -95,15 +92,15 @@ dhcp-range=${INTERFACE},${NODE_START_IP},${NODE_END_IP},255.255.255.0,86400  # �
 EOF"
 }
 
-
 # ==============================
 # 封装函数：配置 DHCP Failover
 # ==============================
 configure_dhcp_failover() {
     local NODE=$1
     local OUTPUT_FILE="/etc/dnsmasq.conf"
-
-# 使用 SSH 远程清空文件内容并写入头部信息
+    
+    ssh root@$NODE "apt install -y dnsmasq"
+    # 使用 SSH 远程清空文件内容并写入头部信息
     ssh root@$NODE "cat <<EOF | tee $OUTPUT_FILE > /dev/null
 # 动态生成的 DHCP 配置
 # Node: $NODE
@@ -124,18 +121,18 @@ EOF"
                 continue
             fi
 
-            local VLAN_GATEWAY=$(get_gateway_ip "$VLAN_CIDR" "$i")
+            local VLAN_GATEWAY=$(get_gateway_ip "$VLAN_CIDR" "$size")
             local VLAN_TAG=$((VLAN_TAG_BASE + VLAN_INDEX))
-            
+
             local VLAN_INTERFACE=${VLAN_OVS_BRIDGE}_${VLAN_TAG}
-            
+
             if [[ "$VLAN_MODE" == "ovs" ]]; then
                 VLAN_INTERFACE=${VLAN_OVS_BRIDGE}_${VLAN_TAG}
-    	    elif [[ "$VLAN_MODE" == "iproute2" ]]; then
-                VLAN_INTERFACE=${VLAN_iproute2_BRIDGE}_${VLAN_TAG}      
-    	    fi
-            
-            configure_dhcp_for_cidr "$NODE" "$VLAN_CIDR" "$VLAN_GATEWAY" "${VLAN_INTERFACE}"  "${#NODES[@]}"
+            elif [[ "$VLAN_MODE" == "iproute2" ]]; then
+                VLAN_INTERFACE=${VLAN_iproute2_BRIDGE}_${VLAN_TAG}
+            fi
+
+            configure_dhcp_for_cidr "$NODE" "$VLAN_CIDR" "$VLAN_GATEWAY" "${VLAN_INTERFACE}" "${#NODES_IP[@]}"
             ((VLAN_INDEX += 10))
         done
     fi
@@ -149,9 +146,9 @@ EOF"
             if [[ -z "$VXLAN_CIDR" || "$VXLAN_CIDR" =~ ^[[:space:]]+$ ]]; then
                 continue
             fi
-
-            local VXLAN_GATEWAY=$(get_gateway_ip "$VXLAN_CIDR" "$i")
-            configure_dhcp_for_cidr "$NODE" "$VXLAN_CIDR" "$VXLAN_GATEWAY" "br_vxlan" "$VXLAN_INDEX" "${#NODES[@]}"
+            VXLAN_INTERFACE="br_vxlan${VXLAN_INDEX}"
+            local VXLAN_GATEWAY=$(get_gateway_ip "$VXLAN_CIDR" "$size")
+            configure_dhcp_for_cidr "$NODE" "$VXLAN_CIDR" "$VXLAN_GATEWAY" "${VXLAN_INTERFACE}" "$VXLAN_INDEX" "${#NODES_IP[@]}"
             ((VXLAN_INDEX += 10))
         done
     fi
@@ -162,5 +159,3 @@ EOF"
     # 输出调试信息
     echo "DHCP 配置已成功写入远程节点 $NODE 的 $OUTPUT_FILE 文件，并已重启 dnsmasq 服务。"
 }
-
-

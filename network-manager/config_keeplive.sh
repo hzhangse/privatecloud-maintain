@@ -9,7 +9,7 @@ configure_keepalived() {
     local ACT_NET_DEV=$3
     local STATE="MASTER"       # MASTER 或 BACKUP
     local PRIORITY=100    # 节点优先级
-    if [ "$i" -eq 1 ]; then
+    if [ "$size" -eq 1 ]; then
         STATE="MASTER"          # 第一个节点是主节点
         PRIORITY=100            # 主节点优先级较高
     else

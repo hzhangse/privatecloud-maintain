@@ -63,7 +63,7 @@ EOF"
     # 配置 VLAN 的 DHCP
     local VLAN_INDEX=10
     for VLAN_CIDR in "${VLAN_CIDRS[@]}"; do
-        local VLAN_GATEWAY=$(get_gateway_ip "$VLAN_CIDR" "$i")
+        local VLAN_GATEWAY=$(get_gateway_ip "$VLAN_CIDR" "$size")
         configure_dhcp_for_cidr "$NODE" "$VLAN_CIDR" "$VLAN_GATEWAY" "vlan" "$VLAN_INDEX" "${#NODES[@]}"
         ((VLAN_INDEX += 10))
     done
@@ -71,7 +71,7 @@ EOF"
     # 配置 VXLAN 的 DHCP
     local VXLAN_INDEX=10
     for VXLAN_CIDR in "${VXLAN_CIDRS[@]}"; do
-        local VXLAN_GATEWAY=$(get_gateway_ip "$VXLAN_CIDR" "$i")
+        local VXLAN_GATEWAY=$(get_gateway_ip "$VXLAN_CIDR" "$size")
         configure_dhcp_for_cidr "$NODE" "$VXLAN_CIDR" "$VXLAN_GATEWAY" "br_vxlan" "$VXLAN_INDEX" "${#NODES[@]}"
         ((VXLAN_INDEX += 10))
     done

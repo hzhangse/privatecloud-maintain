@@ -1,11 +1,10 @@
 #!/bin/bash
 
 # 定义全局参数
-IPROUTE2_MODE="interfaces"                         # 可选值：command, interfaces
+IPROUTE2_MODE="interfaces" # 可选值：command, interfaces
 
 VETHPAIR_HOST="veth_peer_host"
 VETHPAIR_VLAN="veth_peer_vlan"
-
 
 # 辅助函数：根据 CIDR 和节点顺序生成网关 IP
 get_gateway_ip() {
@@ -25,7 +24,6 @@ $FILE_CONTENT
 EOF"
 }
 
-
 # 配置 VLAN（iproute2 模式，基于命令）
 configure_vlan_iproute2_command() {
     local NODE=$1
@@ -33,7 +31,7 @@ configure_vlan_iproute2_command() {
     local VLAN_CIDRS=("$@")
 
     # 检查基础接口是否存在
-    ssh root@$NODE << EOF
+    ssh root@$NODE <<EOF
     if ! ip link show "$BASE_INTERFACE" &>/dev/null; then
         echo "Error: Base interface '$BASE_INTERFACE' does not exist on node $NODE."
         exit 1
@@ -76,7 +74,7 @@ EOF
                 local VLAN_TAG=$((VLAN_TAG_BASE + VLAN_INDEX))
                 local VLAN_INTERFACE="vlan${VLAN_TAG}"
 
-                ssh root@$NODE << EOF
+                ssh root@$NODE <<EOF
                 # 检查 VLAN 接口是否已存在
                 if ip link show "$VLAN_INTERFACE" &>/dev/null; then
                     echo "VLAN interface '$VLAN_INTERFACE' already exists on node $NODE. Skipping creation."
@@ -117,7 +115,7 @@ configure_vlan_iproute2_interfaces() {
     local NODE=$1
     shift
     local VLAN_CIDRS=("$@")
-    
+
     # 动态生成 VLAN 接口配置
     local VLAN_INDEX=10
     for i in "${!NODES[@]}"; do
@@ -149,6 +147,37 @@ iface ${VLAN_INTERFACE} inet static
     done
 }
 
+generate_vlan_bridge() {
+    local NODE=$1
+    if [[ "$NETWORK_MODE" == "vlan" ]]; then
+        local vlan_bridge_config="
+        
+auto $VLAN_OVS_BRIDGE   
+iface $VLAN_OVS_BRIDGE  inet manual
+    pre-up ovs-vsctl --may-exist add-br $VLAN_OVS_BRIDGE  || true
+    up ip link set $VLAN_OVS_BRIDGE  up || true
+    post-down ovs-vsctl del-br $VLAN_OVS_BRIDGE
+    ovs_type OVSBridge
+    ovs_ports ${VETHPAIR_VLAN} 
+    
+"
+        write_interfaces_file "$NODE" "$vlan_bridge_config"
+    elif [[ "$NETWORK_MODE" == "vlan-vxlan" ]]; then
+        local vlan_bridge_config="
+    
+auto $VLAN_OVS_BRIDGE   
+iface $VLAN_OVS_BRIDGE inet manual
+    pre-up ovs-vsctl --may-exist add-br $VLAN_OVS_BRIDGE  || true
+    up ip link set $VLAN_OVS_BRIDGE  up || true
+    post-down ovs-vsctl del-br $VLAN_OVS_BRIDGE
+    ovs_type OVSBridge
+    ovs_ports ${VETHPAIR_VLAN}  
+"
+        write_interfaces_file "$NODE" "$vlan_bridge_config"
+    fi
+
+}
+
 # 配置 VLAN（OVS 模式）
 configure_vlan_ovs() {
     local NODE=$1
@@ -169,17 +198,14 @@ auto ${VETHPAIR_VLAN}
 iface ${VETHPAIR_VLAN} inet manual
     ovs_type OVSPort
     ovs_bridge $VLAN_OVS_BRIDGE   
-
-auto $VLAN_OVS_BRIDGE   
-iface $VLAN_OVS_BRIDGE  inet manual
-    ovs_type OVSBridge
-    ovs_ports ${VETHPAIR_VLAN}
     
 "
     write_interfaces_file "$NODE" "$VETH_CONFIG"
-    
-   append_to_bridge_ports "$NODE" "${BASE_INTERFACE}"  "${VETHPAIR_HOST}"
-    
+
+    generate_vlan_bridge "$NODE"
+    #在vmbr0上回写vethost
+    append_to_bridge_ports "$NODE" "${BASE_INTERFACE}" "${VETHPAIR_HOST}"
+
     # 动态生成 VLAN 接口配置
     local VLAN_INDEX=10
     for i in "${!NODES[@]}"; do
@@ -191,6 +217,7 @@ iface $VLAN_OVS_BRIDGE  inet manual
                 local VLAN_CONFIG="
 auto $VLAN_INTERFACE
 iface $VLAN_INTERFACE inet static
+    pre-up ovs-vsctl --may-exist add-br $VLAN_OVS_BRIDGE  && ovs-vsctl add-port $VLAN_OVS_BRIDGE $VLAN_INTERFACE
     address $VLAN_GATEWAY/$(echo "$VLAN_CIDR" | cut -d'/' -f2)
     ovs_type OVSIntPort
     ovs_bridge  $VLAN_OVS_BRIDGE
@@ -226,4 +253,3 @@ configure_vlan() {
         exit 1
     fi
 }
-

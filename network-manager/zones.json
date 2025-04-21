@@ -1,0 +1,76 @@
+{
+  "zones": [
+    {
+      "ZONE_NAME": "east-1",
+      "BASE_INTERFACE": "vmbr0",
+      "NETWORK_MODE": "vlan-vxlan",
+      "ZONE_GATEWAY": "192.168.122.1",
+      "DNS_NODE": "192.168.122.91",
+      "VLAN": {
+        "MODE": "ovs",
+        "TAG_BASE": 0,
+        "OVS_BRIDGE": "ovsbr_vlan",
+        "CIDRS": [
+          "172.16.30.0/24"
+        ]
+      },
+      "VXLAN": {
+        "TUNPOINT": "192.168.122.91",
+        "ENDPOINTS": [
+          "193.168.122.94"
+        ],
+        "MODE": "p2p_ovs",
+        "ID": 10,
+        "DSTPORT": 4789,
+        "ID_BASE": 10,
+        "CIDRS": [
+          "172.16.30.0/24"
+        ]
+      },
+      "NODES": [
+        {
+          "IP": "192.168.122.91"
+        },
+        {
+          "IP": "192.168.122.92"
+        }
+      ]
+    },
+    {
+      "ZONE_NAME": "west-1",
+      "BASE_INTERFACE": "vmbr0",
+      "NETWORK_MODE": "vlan-vxlan",
+      "ZONE_GATEWAY": "193.168.122.1",
+      "DNS_NODE": "193.168.122.94",
+      "VLAN": {
+        "MODE": "ovs",
+        "TAG_BASE": 0,
+        "OVS_BRIDGE": "ovsbr_vlan",
+        "CIDRS": [
+          "172.16.40.0/24"
+        ]
+      },
+      "VXLAN": {
+        "TUNPOINT": "193.168.122.94",
+        "ENDPOINTS": [
+          "192.168.122.91"
+        ],
+        "MODE": "p2p_ovs",
+        "ID": 10,
+        "DSTPORT": 4789,
+        "ID_BASE": 10,
+        "CIDRS": [
+          "172.16.40.0/24"
+        ]
+      },
+      "NODES": [
+        {
+          "IP": "193.168.122.94"
+        },
+        {
+          "IP": "193.168.122.95"
+        }
+      ]
+    }
+  ]
+}

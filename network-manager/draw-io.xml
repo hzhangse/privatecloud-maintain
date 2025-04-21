@@ -1,0 +1,96 @@
+<mxfile host="app.diagrams.net" modified="2024-04-13T23:46:43.581Z" agent="5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/112.0.0.0 Safari/537.36" etag="j5W_5kG3XjM3sZkfG5Xx" version="21.8.2" type="device">
+  <diagram id="kX7X7yEeSkj3uK3k7X7X" name="Network Architecture">
+    <mxGraphModel dx="1393" dy="683" grid="1" gridSize="10" guides="1" tooltips="1" connect="1" arrows="1" fold="1" page="1" pageScale="1" pageWidth="827" pageHeight="1169" math="0" shadow="0">
+      <root>
+        <mxCell id="0"/>
+        <mxCell id="1" parent="0"/>
+        <mxCell id="2" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;aspect=fixed;fillColor=#f5f7fa;strokeColor=#c5c8cc;">
+          <mxGeometry x="50" y="50" width="600" height="400" as="geometry"/>
+          <![CDATA[<center><b>East-1 区域<br>(192.168.122.0/24)</b></center>]]>
+        </mxCell>
+        <mxCell id="3" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e8f5ff;strokeColor=#99c2ff;">
+          <mxGeometry x="100" y="100" width="200" height="150" as="geometry"/>
+          <![CDATA[<center><b>基础接口 (vmbr0)<br>网关: 192.168.122.1</b></center>]]>
+        </mxCell>
+        <mxCell id="4" parent="1" vertex="1" style="shape=server;whiteSpace=wrap;html=1;fillColor=#4a90e2;strokeColor=#2f68b0;">
+          <mxGeometry x="250" y="280" width="150" height="100" as="geometry"/>
+          <![CDATA[<center><b>节点1<br>192.168.122.91<br>(DNS服务器)</b></center>]]>
+        </mxCell>
+        <mxCell id="5" parent="1" vertex="1" style="shape=server;whiteSpace=wrap;html=1;fillColor=#4a90e2;strokeColor=#2f68b0;">
+          <mxGeometry x="450" y="280" width="150" height="100" as="geometry"/>
+          <![CDATA[<center><b>节点2<br>192.168.122.92</b></center>]]>
+        </mxCell>
+        <mxCell id="6" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#80cbc4;dashStyle=3;">
+          <mxGeometry x="200" y="400" width="250" height="120" as="geometry"/>
+          <![CDATA[<center><b>VLAN 172.16.30.0/24<br>OVS桥接: ovsbr_vlan</b></center>]]>
+        </mxCell>
+        <mxCell id="7" parent="1" edge="1" style="endArrow=none;strokeColor=#64b5f6;dashStyle=3;">
+          <mxGeometry x="100" y="175" width="200" height="0" relative="1" as="geometry"/>
+          <mxPoint x="200" y="150" as="points"/>
+          <mxPoint x="200" y="250" as="points"/>
+        </mxCell>
+        <mxCell id="8" parent="1" edge="1" style="endArrow=none;strokeColor=#2196f3;">
+          <mxGeometry x="150" y="250" width="0" height="30" relative="1" as="geometry"/>
+          <mxPoint x="250" y="250" as="points"/>
+          <mxPoint x="250" y="280" as="points"/>
+        </mxCell>
+        <mxCell id="9" parent="1" edge="1" style="endArrow=none;strokeColor=#2196f3;">
+          <mxGeometry x="350" y="250" width="0" height="30" relative="1" as="geometry"/>
+          <mxPoint x="450" y="250" as="points"/>
+          <mxPoint x="450" y="280" as="points"/>
+        </mxCell>
+        <mxCell id="10" parent="1" edge="1" style="endArrow=none;strokeColor=#80cbc4;dashStyle=3;">
+          <mxGeometry x="200" y="460" width="250" height="0" relative="1" as="geometry"/>
+          <mxPoint x="325" y="460" as="points"/>
+          <mxPoint x="325" y="520" as="points"/>
+        </mxCell>
+        <mxCell id="11" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#f5f7fa;strokeColor=#c5c8cc;">
+          <mxGeometry x="700" y="50" width="600" height="400" as="geometry"/>
+          <![CDATA[<center><b>West-1 区域<br>(193.168.122.0/24)</b></center>]]>
+        </mxCell>
+        <mxCell id="12" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e8f5ff;strokeColor=#99c2ff;">
+          <mxGeometry x="750" y="100" width="200" height="150" as="geometry"/>
+          <![CDATA[<center><b>基础接口 (vmbr0)<br>网关: 193.168.122.1</b></center>]]>
+        </mxCell>
+        <mxCell id="13" parent="1" vertex="1" style="shape=server;whiteSpace=wrap;html=1;fillColor=#4a90e2;strokeColor=#2f68b0;">
+          <mxGeometry x="900" y="280" width="150" height="100" as="geometry"/>
+          <![CDATA[<center><b>节点1<br>193.168.122.94<br>(DNS服务器)</b></center>]]>
+        </mxCell>
+        <mxCell id="14" parent="1" vertex="1" style="shape=server;whiteSpace=wrap;html=1;fillColor=#4a90e2;strokeColor=#2f68b0;">
+          <mxGeometry x="1100" y="280" width="150" height="100" as="geometry"/>
+          <![CDATA[<center><b>节点2<br>193.168.122.95</b></center>]]>
+        </mxCell>
+        <mxCell id="15" parent="1" vertex="1" style="shape=rectangle;whiteSpace=wrap;html=1;fillColor=#e0f2f1;strokeColor=#80cbc4;dashStyle=3;">
+          <mxGeometry x="850" y="400" width="250" height="120" as="geometry"/>
+          <![CDATA[<center><b>VLAN 172.16.40.0/24<br>OVS桥接: ovsbr_vlan</b></center>]]>
+        </mxCell>
+        <mxCell id="16" parent="1" edge="1" style="endArrow=none;strokeColor=#64b5f6;dashStyle=3;">
+          <mxGeometry x="750" y="175" width="200" height="0" relative="1" as="geometry"/>
+          <mxPoint x="850" y="150" as="points"/>
+          <mxPoint x="850" y="250" as="points"/>
+        </mxCell>
+        <mxCell id="17" parent="1" edge="1" style="endArrow=none;strokeColor=#2196f3;">
+          <mxGeometry x="900" y="250" width="0" height="30" relative="1" as="geometry"/>
+          <mxPoint x="900" y="250" as="points"/>
+          <mxPoint x="900" y="280" as="points"/>
+        </mxCell>
+        <mxCell id="18" parent="1" edge="1" style="endArrow=none;strokeColor=#2196f3;">
+          <mxGeometry x="1100" y="250" width="0" height="30" relative="1" as="geometry"/>
+          <mxPoint x="1100" y="250" as="points"/>
+          <mxPoint x="1100" y="280" as="points"/>
+        </mxCell>
+        <mxCell id="19" parent="1" edge="1" style="endArrow=none;strokeColor=#80cbc4;dashStyle=3;">
+          <mxGeometry x="850" y="460" width="250" height="0" relative="1" as="geometry"/>
+          <mxPoint x="975" y="460" as="points"/>
+          <mxPoint x="975" y="520" as="points"/>
+        </mxCell>
+        <mxCell id="20" parent="1" edge="1" style="endArrow=none;strokeColor=#6c757d;dashStyle=5;startArrow=classic;endArrow=classic;">
+          <mxGeometry x="250" y="280" width="0" height="0" relative="1" as="geometry"/>
+          <mxPoint x="250" y="280" as="points"/>
+          <mxPoint x="900" y="280" as="points"/>
+          <![CDATA[<center>vxlan隧道<br>ID:10<br>起点:192.168.122.91<br>终点:193.168.122.94</center>]]>
+        </mxCell>
+      </root>
+    </mxGraphModel>
+  </diagram>
+</mxfile>
