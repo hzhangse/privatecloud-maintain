@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # 定义变量
-VM_NAME=k8s01
+VM_NAME=k8s02
 workdir=$(pwd)                                   # 虚拟机名称
 IMAGE_PATH=""                                    # 基础镜像路径
 CLOUD_INIT_DIR="$workdir/cloud-init/$VM_NAME"    # cloud-init 配置目录
@@ -15,19 +15,15 @@ VG_NAME="vg_pve"                                 # LVM 卷组名称
 LV_NAME="lv-${VM_NAME}"
 NetWork=default
 
-init_workdir() {
-  # 创建工作目录
-
-}
+IMAGE_PATH=${workdir}/$VM_NAME.img
 
 create_cloud_init() {
   # 创建 cloud-init 目录
   sudo apt install -y genisoimage
-  mkdir -p $workdir/$VM_NAME
-  cp /home/ryan/tools/virtual-proxmox/noble-server-cloudimg-amd64.img $workdir/$VM_NAME/
+  
   mkdir -p "$CLOUD_INIT_DIR"
   cp /home/ryan/tools/virtual-proxmox/noble-server-cloudimg-amd64.img ${workdir}/$VM_NAME.img
-  IMAGE_PATH=${workdir}/$VM_NAME.img
+
 
   # 创建 meta-data 文件
   cat <<EOF >"$CLOUD_INIT_DIR/meta-data"
@@ -120,8 +116,8 @@ resize_image_partition() {
   df -h
 }
 main() {
-  # create_cloud_init
-  # create_vm_using_image
+   #create_cloud_init
+   #create_vm_using_image
   resize_image 20G
 }
 
