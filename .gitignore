@@ -1,0 +1,15 @@
+libvirtvm/k8s03.img
+libvirtvm/k8s02.img
+libvirtvm/k8s01.img
+libvirtvm/cloud-init/k8s01/cloud-init.iso
+libvirtvm/cloud-init/k8s01/cloud-init.iso
+libvirtvm/cloud-init/k8s01/user-data
+libvirtvm/cloud-init/k8s02/cloud-init.iso
+libvirtvm/cloud-init/k8s02/meta-data
+libvirtvm/cloud-init/k8s02/user-data
+libvirtvm/cloud-init/k8s03/cloud-init.iso
+libvirtvm/cloud-init/k8s03/meta-data
+libvirtvm/cloud-init/k8s03/user-data
+libvirtvm/cloud-init/k8s01/user-data
+libvirtvm/cloud-init/k8s01/cloud-init.iso
+
